@@ -1,0 +1,11 @@
+# FastMCP Gmail - Core Dependencies
+google-api-python-client>=2.100.0
+google-auth-httplib2>=0.1.0
+google-auth-oauthlib>=1.0.0
+
+# Development Dependencies (optional - install with 'make dev-install')
+# black>=23.0.0
+# flake8>=6.0.0
+# pytest>=7.0.0
+# pytest-html>=3.0.0
+# mypy>=1.0.0
