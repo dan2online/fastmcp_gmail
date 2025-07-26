@@ -86,22 +86,26 @@ class TestLLMCache(unittest.TestCase):
     
     def setUp(self):
         """Setup test environment"""
-        # Clean up any existing test cache
+        # Clean up any existing cache files
         import os
-        if os.path.exists("test_cache.json"):
-            os.remove("test_cache.json")
+        import shutil
+        for cache_dir in ["cache", "logs"]:
+            if os.path.exists(cache_dir):
+                shutil.rmtree(cache_dir)
     
     def tearDown(self):
         """Clean up test environment"""
         import os
-        if os.path.exists("test_cache.json"):
-            os.remove("test_cache.json")
+        import shutil
+        for cache_dir in ["cache", "logs"]:
+            if os.path.exists(cache_dir):
+                shutil.rmtree(cache_dir)
     
     def test_cache_operations(self):
         """Test basic cache load/save operations"""
         from core.llm_cache import load_cache, save_cache
         
-        # Test empty cache
+        # Test empty cache (should be empty after cleanup)
         cache = load_cache()
         self.assertEqual(cache, {})
         

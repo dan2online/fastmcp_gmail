@@ -3,6 +3,7 @@ from core.ollama_llm import ollama_llm_streaming
 from core.llm_cache import cached_llm
 from core.gmail_client import get_latest_email
 
+
 def main():
     agent = MCPAgent(local_llm=lambda p: cached_llm(p, ollama_llm_streaming))
     email = get_latest_email()

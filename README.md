@@ -21,14 +21,21 @@ fastmcp_gmail/
 ├── send_email_summary.py       # Daily email summary generator
 ├── requirements.txt            # Python dependencies
 ├── Makefile                    # Project automation
+├── GMAIL_SETUP.md             # Gmail API setup guide
 ├── core/
 │   ├── mcp_agent.py           # Core MCP agent with confidence handling
 │   ├── gmail_client.py        # Gmail API integration
+│   ├── gmail_reader.py        # Enhanced Gmail reading functionality
 │   ├── ollama_llm.py          # Ollama LLM integration
 │   ├── llm_cache.py           # Response caching system
 │   ├── llm_log.py             # Conversation logging
 │   └── email_summarizer.py    # Email summarization logic
+├── tests/
+│   ├── manual/                # Manual interactive tests
+│   │   └── test_real_setup.py # Gmail setup verification
+│   └── test_*.py              # Automated unit tests
 ├── scripts/
+│   ├── fix_gmail_verification.py # Gmail troubleshooting utility
 │   ├── setup_dev.sh           # Development environment setup
 │   └── build_package.sh       # Package build script
 └── tools/
@@ -46,8 +53,29 @@ fastmcp_gmail/
 
 ### 1. Setup Environment
 ```bash
-make setup
+make setup          # Create virtual environment and install dependencies
+make verify-setup   # Verify everything is ready for Gmail setup
 ```
+
+### 2. Gmail API Setup (First Time)
+```bash
+# Get guided help for Google Cloud Console setup
+make fix-gmail-auth
+
+# After downloading credentials.json from Google Cloud Console:
+make auth-setup     # Complete OAuth authentication
+make test-gmail     # Verify Gmail connection works
+```
+
+**Gmail Setup Steps:**
+1. **Google Cloud Console**: Create project → Enable Gmail API → Configure OAuth
+2. **Download credentials**: Save `credentials.json` to project root
+3. **Authenticate**: Run `make auth-setup` (opens browser)
+4. **Test**: Run `make test-gmail` to verify connection
+
+📖 **Detailed Gmail setup guide**: See [GMAIL_SETUP.md](GMAIL_SETUP.md)
+
+### 3. Start Using
 
 ### 2. Configure Gmail API
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
@@ -87,10 +115,64 @@ pip install -r requirements.txt
 
 ### Using Make Commands
 ```bash
-make setup      # Setup development environment
-make test       # Run tests (when available)
-make clean      # Clean cache and temporary files
-make release    # Prepare release package
+# Setup and Configuration
+make setup           # Setup development environment
+make verify-setup    # Verify Gmail setup readiness
+make status         # Show current project status
+
+# Gmail Authentication
+make fix-gmail-auth  # Get help with Gmail API setup
+make auth-setup     # Complete Gmail OAuth authentication
+make test-gmail     # Test Gmail API connection
+
+# Running the Application
+make run            # Process latest email with AI
+make demo           # Run enhanced Gmail reader demo
+make summary        # Generate daily email summary
+
+# Development and Testing
+make test           # Run automated tests
+make integration-test # Run full integration test with Gmail
+make clean          # Clean cache and temporary files
+make help           # Show all available commands
+```
+
+### Manual Setup (Alternative)
+If you prefer manual setup:
+- **Quick setup**: See [docs/GMAIL_SETUP.md](docs/GMAIL_SETUP.md) for essential steps
+- **Command reference**: See [docs/WORKFLOW_CHEATSHEET.md](docs/WORKFLOW_CHEATSHEET.md) for all commands
+- **Detailed guide**: This README contains the complete documentation
+
+## 📁 Project Structure
+```
+fastmcp_gmail/
+├── core/                   # Core modules
+│   ├── email_summarizer.py # Email summarization logic
+│   ├── gmail_client.py     # Gmail API client
+│   ├── gmail_reader.py     # Gmail reading functionality
+│   ├── llm_cache.py        # LLM caching system
+│   ├── llm_log.py          # LLM logging utilities
+│   ├── mcp_agent.py        # MCP agent implementation
+│   └── ollama_llm.py       # Ollama LLM integration
+├── tests/
+│   ├── manual/             # Manual test scripts
+│   │   └── test_real_setup.py
+│   └── test_gmail_reader.py # Automated tests
+├── scripts/                # Utility scripts
+│   ├── build_package.sh    # Package building
+│   ├── setup_dev.sh        # Development setup
+│   └── fix_gmail_verification.py # Gmail auth troubleshooting
+├── tools/
+│   └── parse_email.py      # Email parsing utilities
+├── main.py                 # Main application entry
+├── send_email_summary.py   # Email summary sender
+├── Makefile               # Development automation
+├── docs/                   # Documentation
+│   ├── GMAIL_SETUP.md      # Quick Gmail setup reference
+│   └── WORKFLOW_CHEATSHEET.md # Command quick reference
+├── requirements.txt       # Python dependencies
+├── .env.template          # Environment template
+└── .gitignore            # Git ignore rules
 ```
 
 ## 📋 Usage
@@ -129,9 +211,10 @@ python send_email_summary.py
 - Responses below threshold are marked as `[Low confidence]`
 
 ### Caching
-- LLM responses cached in `llm_cache.json`
-- Email summaries cached in `email_summary_cache.json`
-- Conversation logs saved in `llm_log.md`
+- LLM responses cached in `cache/llm_cache.json`
+- Email summaries cached in `cache/email_summary_cache.json`
+- Conversation logs saved in `logs/llm_log.md`
+- Server logs saved in `logs/fastmcp_server.log`
 
 ## 🔒 Privacy & Security
 

@@ -3,11 +3,12 @@
 # Sensitive files
 credentials.json
 token.json
+.env.local
 
 # Cache and log files
-llm_cache.json
-email_summary_cache.json
-llm_log.md
+logs/
+cache/
+*.log
 
 # Build and temporary directories
 build/

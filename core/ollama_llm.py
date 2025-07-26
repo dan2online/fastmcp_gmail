@@ -1,11 +1,14 @@
 import subprocess
 
+
 def ollama_llm_streaming(prompt: str):
     try:
-        process = subprocess.Popen(["ollama", "run", "llama3", prompt],
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE,
-                                   text=True)
+        process = subprocess.Popen(
+            ["ollama", "run", "llama3", prompt],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
         print("🤖 [Streaming response]: ", end="", flush=True)
         output = []
         while True:
