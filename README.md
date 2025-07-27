@@ -1,26 +1,31 @@
 # FastMCP Gmail - AI-Powered Email Assistant
 
-A privacy-focused Gmail AI assistant that uses local LLM processing via Ollama to generate intelligent email responses and summaries. Built following the Model Context Protocol (MCP) pattern for reliable AI interactions.
+A privacy-focused Gmail AI assistant that uses local LLM processing via Ollama to generate intelligent email responses and summaries. Built with FastMCP framework following the Model Context Protocol (MCP) for reliable AI interactions with **Claude Desktop** and **VS Code** integration.
 
 ## 🚀 Features
 
+- **FastMCP Server**: Full MCP server implementation with 6 specialized Gmail tools
+- **Multi-Platform Support**: Works with Claude Desktop, VS Code (Continue/Cline), and direct MCP clients
 - **Smart Email Processing**: Fetches and processes Gmail messages using Google API
 - **Local AI Processing**: Uses Ollama with Llama3 for privacy-focused local inference
 - **Intelligent Caching**: JSON-based response caching to avoid redundant API calls
 - **Confidence Scoring**: Only accepts high-confidence AI responses (≥85%)
-- **Email Summarization**: Generates daily email summaries for unread messages
+- **Email Summarization**: Generates daily email summaries for unread messages with AI analysis
 - **Professional Replies**: Automatically generates professional email responses
 - **Conversation Logging**: Markdown-based logging of all AI interactions
 - **Streaming Responses**: Real-time AI response streaming
+- **Privacy Testing**: Comprehensive privacy validation and sensitive data protection
+- **Gmail Search**: Advanced email search with query parameters and filters
 
 ## 📁 Project Structure
 
 ```
 fastmcp_gmail/
 ├── main.py                     # Main email processing script
+├── mcp_server.py               # FastMCP server with 6 Gmail tools
 ├── send_email_summary.py       # Daily email summary generator
 ├── requirements.txt            # Python dependencies
-├── Makefile                    # Project automation
+├── Makefile                    # Project automation with 30+ commands
 ├── GMAIL_SETUP.md             # Gmail API setup guide
 ├── core/
 │   ├── mcp_agent.py           # Core MCP agent with confidence handling
@@ -33,9 +38,14 @@ fastmcp_gmail/
 ├── tests/
 │   ├── manual/                # Manual interactive tests
 │   │   └── test_real_setup.py # Gmail setup verification
-│   └── test_*.py              # Automated unit tests
+│   ├── test_recent_emails.py  # Gmail email reading tests
+│   ├── test_llm_privacy.py    # Privacy and security validation
+│   ├── test_privacy_enhanced.py # Enhanced privacy analysis
+│   └── test_*.py              # Automated unit tests (80+ tests)
 ├── scripts/
 │   ├── fix_gmail_verification.py # Gmail troubleshooting utility
+│   ├── setup_claude_desktop.py   # Claude Desktop MCP integration
+│   ├── setup_vscode_mcp.py       # VS Code MCP integration  
 │   ├── setup_dev.sh           # Development environment setup
 │   └── build_package.sh       # Package build script
 └── tools/
@@ -77,29 +87,49 @@ make test-gmail     # Verify Gmail connection works
 
 ### 3. Start Using
 
-### 2. Configure Gmail API
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Enable Gmail API
-3. Create OAuth 2.0 credentials
-4. Download and save as `credentials.json` in project root
-
-### 3. Install Ollama and Llama3
+#### Option A: FastMCP Server (Recommended)
 ```bash
-# Install Ollama (macOS)
-brew install ollama
+# Start the FastMCP server for Claude Desktop/VS Code
+make run-fastmcp
 
-# Pull Llama3 model
-ollama pull llama3
+# Set up Claude Desktop integration
+make setup-claude-desktop
+
+# Set up VS Code integration (Continue/Cline extensions)  
+make setup-vscode
 ```
 
-### 4. Run the Application
+#### Option B: Direct Command Line
 ```bash
 # Process latest email and generate reply
 make run
 
 # Generate daily email summary
 make summary
+
+# Run enhanced Gmail reader demo
+make demo
 ```
+
+## 🤖 FastMCP Server Integration
+
+### Claude Desktop Setup
+```bash
+make setup-claude-desktop    # Automatic Claude Desktop configuration
+```
+
+### VS Code Setup  
+```bash
+make setup-vscode           # Configure Continue/Cline extensions
+```
+
+**Available MCP Tools:**
+- `read_latest_emails` - Fetch recent Gmail messages
+- `search_emails` - Search emails with Gmail queries  
+- `get_email_details` - Get full email content and metadata
+- `summarize_emails_tool` - AI-powered email summarization
+- `send_email_summary` - Send summary emails
+- `test_gmail_connection_tool` - Test Gmail API connectivity
 
 ## 🔧 Development Setup
 
@@ -130,8 +160,17 @@ make run            # Process latest email with AI
 make demo           # Run enhanced Gmail reader demo
 make summary        # Generate daily email summary
 
+# FastMCP Server Commands
+make run-fastmcp    # Start FastMCP server for Claude/VS Code
+make setup-claude-desktop  # Configure Claude Desktop integration
+make setup-vscode   # Configure VS Code integration
+make test-fastmcp   # Test FastMCP server functionality
+
 # Development and Testing
-make test           # Run automated tests
+make test           # Run automated tests (80+ tests)
+make test-emails    # Run Gmail email reading tests
+make test-privacy   # Run privacy and security tests
+make test-privacy-enhanced # Run comprehensive privacy analysis
 make integration-test # Run full integration test with Gmail
 make clean          # Clean cache and temporary files
 make help           # Show all available commands
@@ -157,16 +196,22 @@ fastmcp_gmail/
 ├── tests/
 │   ├── manual/             # Manual test scripts
 │   │   └── test_real_setup.py
-│   └── test_gmail_reader.py # Automated tests
+│   ├── test_recent_emails.py # Gmail email reading tests
+│   ├── test_llm_privacy.py    # Privacy validation tests
+│   ├── test_privacy_enhanced.py # Enhanced privacy analysis
+│   └── test_gmail_reader.py # Automated tests (80+ total)
 ├── scripts/                # Utility scripts
 │   ├── build_package.sh    # Package building
 │   ├── setup_dev.sh        # Development setup
+│   ├── setup_claude_desktop.py # Claude Desktop MCP setup
+│   ├── setup_vscode_mcp.py     # VS Code MCP setup
 │   └── fix_gmail_verification.py # Gmail auth troubleshooting
 ├── tools/
 │   └── parse_email.py      # Email parsing utilities
 ├── main.py                 # Main application entry
+├── mcp_server.py          # FastMCP server with 6 Gmail tools
 ├── send_email_summary.py   # Email summary sender
-├── Makefile               # Development automation
+├── Makefile               # Development automation (30+ commands)
 ├── docs/                   # Documentation
 │   ├── GMAIL_SETUP.md      # Quick Gmail setup reference
 │   └── WORKFLOW_CHEATSHEET.md # Command quick reference
@@ -177,8 +222,19 @@ fastmcp_gmail/
 
 ## 📋 Usage
 
-### Process Latest Email
-The main script fetches your latest Gmail message and generates an AI-powered professional reply:
+### FastMCP Server (Primary Method)
+Start the FastMCP server and connect via Claude Desktop or VS Code:
+
+```bash
+# Start the server
+make run-fastmcp
+
+# In Claude Desktop: "What are my latest emails?"
+# In VS Code: Use Continue extension with "List my recent Gmail messages"
+```
+
+### Direct Command Line
+Process latest email and generate AI-powered professional reply:
 
 ```bash
 python main.py
@@ -192,10 +248,11 @@ python main.py
 ```
 
 ### Generate Email Summary
-Creates a comprehensive summary of unread emails and sends it to yourself:
+Creates a comprehensive AI summary of unread emails and sends it to yourself:
 
 ```bash
 python send_email_summary.py
+# Or via MCP: make run-fastmcp then ask "Summarize my unread emails"
 ```
 
 ## ⚙️ Configuration
@@ -214,16 +271,26 @@ python send_email_summary.py
 - LLM responses cached in `cache/llm_cache.json`
 - Email summaries cached in `cache/email_summary_cache.json`
 - Conversation logs saved in `logs/llm_log.md`
-- Server logs saved in `logs/fastmcp_server.log`
+- FastMCP server logs saved in `logs/fastmcp_server.log`
 
 ## 🔒 Privacy & Security
 
 - **Local Processing**: All AI inference happens locally via Ollama
-- **No External AI APIs**: No data sent to external LLM services
+- **No External AI APIs**: No data sent to external LLM services (except optional Claude Desktop)
 - **Minimal Permissions**: Only requires Gmail modify scope
 - **Transparent Logging**: All interactions logged for review
+- **Privacy Testing**: 12 comprehensive privacy validation tests
+- **Sensitive Data Protection**: Automatic detection and redaction of SSNs, credit cards, passwords
+- **Ephemeral Processing**: No persistent data storage beyond caching
 
 ## 📊 Architecture
+
+### FastMCP Server
+Built with the FastMCP framework providing:
+- **6 Specialized Tools**: Gmail reading, searching, summarization, and connection testing
+- **Multi-Platform Support**: Claude Desktop, VS Code (Continue/Cline), direct MCP clients
+- **Robust Error Handling**: Comprehensive logging and graceful degradation
+- **Streaming Responses**: Real-time AI response streaming
 
 ### MCP Agent Pattern
 The project follows the Model Context Protocol pattern:
@@ -241,9 +308,21 @@ else:
 
 ## 🧪 Testing
 
+**80+ Comprehensive Tests:**
 ```bash
-make test
+make test                    # Run all automated tests
+make test-emails            # Gmail email reading functionality
+make test-privacy           # Privacy and security validation
+make test-privacy-enhanced  # Advanced privacy analysis
+make test-all              # Complete test suite
 ```
+
+**Test Coverage:**
+- Gmail API integration and error handling
+- Email data structure validation
+- Privacy and sensitive data protection
+- MCP server functionality
+- Local LLM processing verification
 
 ## 📦 Building Release
 
@@ -289,14 +368,33 @@ ollama serve
 make setup
 ```
 
+**FastMCP Server Issues:**
+```bash
+# Check server status
+make test-fastmcp
+
+# View server logs
+tail -f logs/fastmcp_server.log
+
+# Restart Claude Desktop integration
+make setup-claude-desktop
+```
+
 ## 🛣 Roadmap
 
+- [x] **FastMCP Server Implementation** - Complete MCP server with 6 Gmail tools
+- [x] **Claude Desktop Integration** - Automated setup and configuration
+- [x] **VS Code Integration** - Continue/Cline extension support
+- [x] **Privacy Testing Framework** - Comprehensive privacy validation (12 tests)
+- [x] **Email Reading Tests** - Full Gmail functionality testing (7 tests)
 - [ ] Add email filtering and rules
 - [ ] Support for multiple LLM backends
 - [ ] Web interface for email management
 - [ ] Email templates and customization
 - [ ] Advanced summarization options
 - [ ] Integration with calendar and tasks
+- [ ] Batch email processing
+- [ ] Email analytics and insights
 
 ---
 
