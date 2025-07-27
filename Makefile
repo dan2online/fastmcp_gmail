@@ -179,7 +179,7 @@ test-email-summary-manual:
 	.venv/bin/python tests/manual/test_email_summary_manual.py
 
 # Run all tests including new email summary tests
-test-all: test test-structure test-integration test-email-summary test-privacy
+test-all: test test-structure test-integration test-email-summary test-privacy test-emails
 	@echo "✅ All test suites completed!"
 
 # Run privacy and LLM sanity tests
@@ -197,6 +197,24 @@ test-privacy-enhanced:
 	@mkdir -p build/tests
 	.venv/bin/python tests/test_privacy_enhanced.py
 	@echo "🔒 Enhanced privacy analysis completed"
+
+# Run Gmail email reading tests
+test-emails:
+	@echo "📧 Running Gmail email reading tests..."
+	@if [ ! -f .venv/bin/python ]; then echo "❌ Virtual environment not found. Run 'make setup' first."; exit 1; fi
+	@mkdir -p build/tests
+	.venv/bin/python -m pytest tests/test_recent_emails.py -v --html=build/tests/email_reading_report.html --self-contained-html
+	@echo "📊 Email reading test report: build/tests/email_reading_report.html"
+
+# Manual display of recent emails (not automated test)
+show-emails:
+	@echo "📧 Displaying recent Gmail emails..."
+	@if [ ! -f .venv/bin/python ]; then echo "❌ Virtual environment not found. Run 'make setup' first."; exit 1; fi
+	@if [ ! -f credentials.json ] && [ ! -f ~/.local/fastmcp_gmail/credentials.json ]; then \
+		echo "⚠️  Gmail credentials not found. Please add credentials.json or run 'make setup-user-config'"; \
+		exit 1; \
+	fi
+	.venv/bin/python tests/test_recent_emails.py
 
 # Install development dependencies
 dev-install: setup
