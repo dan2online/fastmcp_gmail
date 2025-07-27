@@ -18,6 +18,8 @@ help:
 	@echo "  test-structure - Run directory structure tests"
 	@echo "  test-integration - Run Gmail reader integration tests"
 	@echo "  test-email-summary - Run email summary tool tests"
+	@echo "  test-privacy       - Run privacy and LLM sanity tests"
+	@echo "  test-privacy-enhanced - Run advanced privacy analysis"
 	@echo "  test-all       - Run all test suites"
 	@echo "  lint           - Run code linting"
 	@echo "  format         - Format code with black"
@@ -46,6 +48,7 @@ help:
 	@echo "  setup-user-config - Set up centralized user configuration"
 	@echo "  setup-claude-desktop - Set up MCP server for Claude Desktop"
 	@echo "  setup-vscode   - Set up MCP server for VS Code"
+	@echo "  fix-claude     - Fix Claude Desktop configuration and test"
 	@echo "  dev-setup      - Complete VS Code development environment setup"
 	@echo "  install-ollama - Install Ollama and Llama3 model"
 	@echo "  dev-install    - Install development dependencies"
@@ -176,8 +179,24 @@ test-email-summary-manual:
 	.venv/bin/python tests/manual/test_email_summary_manual.py
 
 # Run all tests including new email summary tests
-test-all: test test-structure test-integration test-email-summary
+test-all: test test-structure test-integration test-email-summary test-privacy
 	@echo "✅ All test suites completed!"
+
+# Run privacy and LLM sanity tests
+test-privacy:
+	@echo "🔒 Running privacy and LLM sanity tests..."
+	@if [ ! -f .venv/bin/python ]; then echo "❌ Virtual environment not found. Run 'make setup' first."; exit 1; fi
+	@mkdir -p build/tests
+	.venv/bin/python tests/test_llm_privacy.py
+	@echo "✅ Privacy tests completed"
+
+# Run enhanced privacy analysis
+test-privacy-enhanced:
+	@echo "🛡️ Running enhanced privacy analysis..."
+	@if [ ! -f .venv/bin/python ]; then echo "❌ Virtual environment not found. Run 'make setup' first."; exit 1; fi
+	@mkdir -p build/tests
+	.venv/bin/python tests/test_privacy_enhanced.py
+	@echo "🔒 Enhanced privacy analysis completed"
 
 # Install development dependencies
 dev-install: setup
@@ -528,3 +547,31 @@ test-fastmcp:
 	@echo ""
 	@echo "💡 For full testing, use VS Code with Continue/Cline extensions"
 	@echo "   Or test with Claude Desktop after running: make setup-claude-desktop"
+
+# Fix Claude Desktop configuration and test
+fix-claude: setup-claude-desktop
+	@echo ""
+	@echo "🔧 Testing MCP server startup..."
+	@timeout 3 .venv/bin/python mcp_server.py > /dev/null 2>&1 && echo "✅ MCP server starts correctly" || echo "⚠️  Server startup issue - check logs"
+	@echo ""
+	@echo "🔍 Checking Claude Desktop config..."
+	@if [ -f "$$HOME/Library/Application Support/Claude/claude_desktop_config.json" ]; then \
+		echo "✅ Claude Desktop config file exists"; \
+		if grep -q "fastmcp-gmail" "$$HOME/Library/Application Support/Claude/claude_desktop_config.json" 2>/dev/null; then \
+			echo "✅ FastMCP Gmail server configured in Claude Desktop"; \
+		else \
+			echo "❌ FastMCP Gmail server not found in Claude config"; \
+		fi \
+	else \
+		echo "❌ Claude Desktop config file not found"; \
+	fi
+	@echo ""
+	@echo "🎯 Next Steps:"
+	@echo "   1. Restart Claude Desktop application"
+	@echo "   2. Look for Gmail tools in Claude's interface"
+	@echo "   3. Test with: 'What are my latest emails?'"
+	@echo ""
+	@echo "🆘 If issues persist:"
+	@echo "   - Check server logs: tail -f logs/fastmcp_server.log"
+	@echo "   - Run: make test-fastmcp"
+	@echo "   - Verify Gmail: make test-gmail"

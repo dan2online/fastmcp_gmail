@@ -18,6 +18,8 @@ from fastmcp import FastMCP
 from core.gmail_client import get_gmail_service, test_gmail_connection
 from core.gmail_reader import create_gmail_reader
 from core.email_summarizer import summarize_emails
+from core.ollama_llm import ollama_llm_streaming
+from core.llm_cache import cached_llm
 
 # Initialize FastMCP app
 app = FastMCP("Gmail Assistant")
@@ -25,6 +27,80 @@ app = FastMCP("Gmail Assistant")
 # Global variables for Gmail service (initialized once)
 gmail_service = None
 gmail_reader = None
+
+
+def generate_email_summary(emails):
+    """
+    Generate AI summary for a list of emails
+    
+    Args:
+        emails: List of email dictionaries
+        
+    Returns:
+        Dictionary with summary and insights
+    """
+    if not emails:
+        return {"summary": "No emails to summarize", "key_insights": [], "action_items": []}
+    
+    # Prepare email content for summarization
+    email_content = []
+    for email in emails[:10]:  # Limit to first 10 emails to avoid token limits
+        content = f"From: {email.get('sender', 'Unknown')}\n"
+        content += f"Subject: {email.get('subject', 'No Subject')}\n"
+        content += f"Preview: {email.get('content_preview', '')[:200]}...\n"
+        email_content.append(content)
+    
+    # Create summarization prompt
+    combined_emails = "\n---\n".join(email_content)
+    prompt = f"""Analyze these {len(emails)} emails and provide:
+1. A concise overall summary (2-3 sentences)
+2. Key insights (3-5 bullet points)
+3. Action items needed (if any)
+
+Emails:
+{combined_emails}
+
+Format your response as:
+SUMMARY: [your summary]
+INSIGHTS: [bullet points]
+ACTIONS: [action items if any]"""
+    
+    try:
+        # Use the cached LLM function
+        result = cached_llm(prompt, ollama_llm_streaming)
+        response_text = result.get("text", "Failed to generate summary")
+        
+        # Parse the response
+        summary = "Summary not available"
+        insights = []
+        actions = []
+        
+        if "SUMMARY:" in response_text:
+            summary_part = response_text.split("SUMMARY:")[1].split("INSIGHTS:")[0].strip()
+            summary = summary_part if summary_part else "Summary generated successfully"
+        
+        if "INSIGHTS:" in response_text:
+            insights_part = response_text.split("INSIGHTS:")[1].split("ACTIONS:")[0].strip()
+            insights = [line.strip() for line in insights_part.split('\n') if line.strip()]
+        
+        if "ACTIONS:" in response_text:
+            actions_part = response_text.split("ACTIONS:")[1].strip()
+            actions = [line.strip() for line in actions_part.split('\n') if line.strip()]
+        
+        return {
+            "summary": summary,
+            "key_insights": insights,
+            "action_items": actions,
+            "raw_response": response_text
+        }
+        
+    except Exception as e:
+        return {
+            "summary": f"Error generating summary: {str(e)}",
+            "key_insights": [],
+            "action_items": [],
+            "error": str(e)
+        }
 
 
 def setup_logging():
@@ -230,7 +306,7 @@ def summarize_emails_tool(count: int = 20, query: str = "is:unread") -> dict:
             return {"summary": "No emails found matching the criteria", "count": 0}
 
         # Generate summary using AI
-        summary_result = summarize_emails(emails)
+        summary_result = generate_email_summary(emails)
 
         result = {
             "summary": summary_result.get("summary", "Failed to generate summary"),
