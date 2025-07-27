@@ -46,7 +46,9 @@ class GmailReader:
                 request_params["q"] = query
 
             if not include_spam_trash:
-                request_params["q"] = request_params.get("q", "") + " -in:spam -in:trash"
+                request_params["q"] = (
+                    request_params.get("q", "") + " -in:spam -in:trash"
+                )
 
             # Get message list
             result = self.service.users().messages().list(**request_params).execute()
@@ -98,7 +100,9 @@ class GmailReader:
             # Extract and structure email data
             email_data = self._extract_email_data(message)
 
-            self.logger.debug(f"Successfully read email: {email_data.get('subject', 'No Subject')}")
+            self.logger.debug(
+                f"Successfully read email: {email_data.get('subject', 'No Subject')}"
+            )
             return email_data
 
         except Exception as e:
@@ -239,7 +243,9 @@ class GmailReader:
             data = body.get("data", "")
             if data:
                 # Gmail API returns base64url encoded data
-                decoded = base64.urlsafe_b64decode(data).decode("utf-8", errors="ignore")
+                decoded = base64.urlsafe_b64decode(data).decode(
+                    "utf-8", errors="ignore"
+                )
                 return decoded
             return ""
         except Exception as e:
@@ -305,7 +311,9 @@ class GmailReader:
             value = headers.get(field, "")
             if value:
                 # Simple parsing - in reality you'd want more sophisticated parsing
-                recipients.extend([addr.strip() for addr in value.split(",") if addr.strip()])
+                recipients.extend(
+                    [addr.strip() for addr in value.split(",") if addr.strip()]
+                )
 
         return recipients
 

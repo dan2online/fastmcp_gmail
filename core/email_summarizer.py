@@ -25,12 +25,19 @@ def save_cache(cache):
 
 def fetch_unread_messages():
     service = get_gmail_service()
-    result = service.users().messages().list(userId="me", q="is:unread", maxResults=10).execute()
+    result = (
+        service.users()
+        .messages()
+        .list(userId="me", q="is:unread", maxResults=10)
+        .execute()
+    )
     return result.get("messages", [])
 
 
 def fetch_email_content(service, msg_id):
-    msg = service.users().messages().get(userId="me", id=msg_id, format="full").execute()
+    msg = (
+        service.users().messages().get(userId="me", id=msg_id, format="full").execute()
+    )
     headers = {h["name"]: h["value"] for h in msg["payload"].get("headers", [])}
     subject = headers.get("Subject", "(No Subject)")
     sender = headers.get("From", "(Unknown)")
